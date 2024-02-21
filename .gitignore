@@ -1,0 +1,8 @@
+# Ansible template
+*.retry
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen

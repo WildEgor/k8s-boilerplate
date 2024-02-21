@@ -1,0 +1,22 @@
+---
+namespaces: [apps]
+
+namespace: argocd
+
+projectName: default
+
+repoURL: https://github.com/WildEgor/k8s-boilerplate
+repoPath: argocd/common
+repoBranch: develop
+
+applications:
+  - name: my-app # use app name here
+    annotations:
+      argocd-image-updater.argoproj.io/image-list: my-app=123.dkr.ecr.ap-south-1.amazonaws.com/my-app:latest # use real data here
+      argocd-image-updater.argoproj.io/write-back-method: git
+      argocd-image-updater.argoproj.io/git-branch: develop
+      argocd-image-updater.argoproj.io/my-app.update-strategy: digest
+      argocd-image-updater.argoproj.io/my-app.helm.image-name: my-app
+      argocd-image-updater.argoproj.io/my-app.helm.image-tag: latest
+      argocd-image-updater.argoproj.io/my-app.pull-secret: 'ext:/scripts/ecr-login.sh' # use for ECR
+    namespaces: [apps]
