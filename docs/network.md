@@ -9,6 +9,8 @@ HOST_ALIAS=$(hostname)
 grep -qxF "127.0.0.1 $HOST_ALIAS" /etc/hosts || echo "127.0.0.1 $HOST_ALIAS" | sudo tee -a /etc/hosts
 ```
 
+# SSH
+
 ### Install SSH client and server
 ```bash
 sudo apt install openssh-client \
@@ -22,6 +24,12 @@ sudo apt install openssh-client \
 Show ssh logs
 ```bash
   journalctl -u ssh
+```
+
+Allow root access via ssh
+```bash
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
 ```
 
 Make ssh passwordless (run on every node)
