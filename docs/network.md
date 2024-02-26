@@ -13,12 +13,12 @@ grep -qxF "127.0.0.1 $HOST_ALIAS" /etc/hosts || echo "127.0.0.1 $HOST_ALIAS" | s
 
 ### Install SSH client and server
 ```bash
-sudo apt install openssh-client \
-  sudo apt install openssh-server \
-  sudo systemctl enable ssh \
-  sudo ufw allow ssh \
-  sudo systemctl restart ssh \
-  sudo systemctl status ssh \
+sudo apt install openssh-client -y &&
+  sudo apt install openssh-server -y &&
+  sudo systemctl enable ssh &&
+  sudo ufw allow ssh &&
+  sudo systemctl restart ssh &&
+  sudo systemctl status ssh 
 ```
 
 Show ssh logs
@@ -28,12 +28,12 @@ Show ssh logs
 
 Allow root access via ssh
 ```bash
-sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
 sudo systemctl restart ssh
 ```
 
 Make ssh passwordless (run on every node)
 ```bash
-ssh-keygen -t rsa -b 4096 -C "
+ssh-keygen -t rsa
 ssh-copy-id -i ~/.ssh/id_rsa.pub [user]@[host]
 ```

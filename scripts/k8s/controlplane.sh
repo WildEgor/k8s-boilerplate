@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Set default version
 VERSION=${VERSION:-"1.26.4"}
 
