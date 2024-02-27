@@ -1,0 +1,12 @@
+---
+- name: Create VMs
+  hosts: host
+  gather_facts: false
+  roles:
+    - proxmox
+
+#  tasks:
+#    - name: 'include vars'
+#      include_vars:
+#        dir: '../group_vars/'
+#        files_matching: 'vars.yml'

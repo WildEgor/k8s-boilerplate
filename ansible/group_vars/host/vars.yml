@@ -1,0 +1,43 @@
+api_user: 'root@admin'
+api_password: 'admin' # '{{ vault_api_password }}'
+api_host: '192.168.1.9'
+
+defaults:
+  cores: '1'
+  cpu: '1'
+  memory:
+    ct: '1024'
+  onboot: true
+  node: 'pve'
+  pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  disk: '8'
+  nameserver: '192.168.1.1'
+  storage:
+    ct: 'local'
+  ostemplate: ''
+
+vms:
+  master-node:
+    vmid: '101'
+    type: 'ubuntu'
+    name: 'master-node'
+    cores: '4'
+    memory: '4096'
+    swap: '0'
+    storage: 'local-lvm'
+    network: 'vmbr0'
+    mounts: '{"mp0":"/mnt/shared,mp=/media/mount"}'
+    netif: '{"net0":"name=eth0,gw=192.168.1.1,ip=192.168.1.13/24,bridge=vmbr0,firewall=1"}'
+    password: 'admin' # "{{ vault_101 }}"
+  worker-node:
+    vmid: '102'
+    type: 'ubuntu'
+    name: 'worker-node'
+    cores: '4'
+    memory: '4096'
+    swap: '0'
+    storage: 'local-lvm'
+    network: 'vmbr0'
+    mounts: '{"mp0":"/mnt/shared,mp=/media/mount"}'
+    netif: '{"net0":"name=eth0,gw=192.168.1.1,ip=192.168.1.12/24,bridge=vmbr0,firewall=1"}'
+    password: 'admin' # "{{ vault_102 }}"

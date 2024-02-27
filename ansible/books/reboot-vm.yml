@@ -1,0 +1,19 @@
+---
+- hosts: host
+  remote_user: root
+
+  vars_prompt:
+    - name: VMID
+      prompt: 'Specify VM ID to reboot'
+      private: no
+
+  tasks:
+    - name: Install required packages
+      ansible.builtin.apt:
+        name: jq
+        state: present
+
+    - name: Reboot VM
+      shell: |
+          curl -s -k -b /tmp/cookies -c /tmp/cookies -H "Content-Type: application/json" -X POST -d '{"force": true}' -u "{{ api_user }}":"{{ api_password }}" https://{{ api_host }}/api2/json/nodes/{{ node }}/qemu/{{ VMID }}/status/reboot
+      register: reboot_vm

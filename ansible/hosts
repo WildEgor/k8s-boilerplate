@@ -1,0 +1,11 @@
+# It should live in /etc/ansible/hosts
+
+[host]
+192.168.1.9 ansible_user=root
+
+[dns]
+pihole ansible_host=192.168.1.65 ansible_user=root
+
+[vms]
+master-node ansible_host=192.168.1.13 ansible_user=root
+worker-node ansible_host=192.168.1.12 ansible_user=root
