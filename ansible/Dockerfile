@@ -30,7 +30,8 @@ RUN apk --update --no-cache add \
         py3-yaml \
         python3\
         rsync \
-        sshpass
+        sshpass \
+        nano
 
 RUN apk --update --no-cache add --virtual \
         .build-deps \
@@ -57,13 +58,15 @@ RUN find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
   && find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
 RUN mkdir -p /etc/ansible/playbooks \
-  && echo 'localhost' > /etc/ansible/hosts \
+  && mkdir -p /etc/ansible/hosts \
   && echo -e """\
 \n\
 Host *\n\
     StrictHostKeyChecking no\n\
     UserKnownHostsFile=/dev/null\n\
 """ >> /etc/ssh/ssh_config
+
+COPY ./hosts /etc/ansible/hosts
 
 WORKDIR /ansible
 

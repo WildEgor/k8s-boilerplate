@@ -1,4 +1,4 @@
-api_user: 'root@admin'
+api_user: 'root@pam'
 api_password: 'admin' # '{{ vault_api_password }}'
 api_host: '192.168.1.9'
 
@@ -9,6 +9,7 @@ defaults:
     ct: '1024'
   onboot: true
   node: 'pve'
+  password: 'admin'
   pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
   disk: '8'
   nameserver: '192.168.1.1'
@@ -16,28 +17,60 @@ defaults:
     ct: 'local'
   ostemplate: ''
 
+image:
+  url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  name: "jammy-server-cloudimg-amd64.img"
+  dest: "/var/lib/vz/template/iso/jammy-server-cloudimg-amd64.img"
+
+template:
+  id: "9000"
+  name: "ubuntu-server-template"
+  user: "ubuntu"
+  password: "admin" # "{{ vault_template_password }}"
+  cores: "4"
+  memory: "4096"
+  volumeName: "local-lvm"
+  network: "vmbr0"
+  rootPassword: "admin" # "{{ vault_template_rootPassword }}"
+  sshPubKey: "~/.ssh/id_rsa.pub"
+  cpuType: "host"
+  ip: "dhcp"
+
 vms:
-  master-node:
-    vmid: '101'
+  test-node:
+    vmid: '103'
     type: 'ubuntu'
-    name: 'master-node'
+    name: 'test-node'
     cores: '4'
     memory: '4096'
     swap: '0'
     storage: 'local-lvm'
     network: 'vmbr0'
-    mounts: '{"mp0":"/mnt/shared,mp=/media/mount"}'
+    # mounts: '{"mp0":"/mnt/shared,mp=/media/mount"}'
     netif: '{"net0":"name=eth0,gw=192.168.1.1,ip=192.168.1.13/24,bridge=vmbr0,firewall=1"}'
-    password: 'admin' # "{{ vault_101 }}"
-  worker-node:
-    vmid: '102'
-    type: 'ubuntu'
-    name: 'worker-node'
-    cores: '4'
-    memory: '4096'
-    swap: '0'
-    storage: 'local-lvm'
-    network: 'vmbr0'
-    mounts: '{"mp0":"/mnt/shared,mp=/media/mount"}'
-    netif: '{"net0":"name=eth0,gw=192.168.1.1,ip=192.168.1.12/24,bridge=vmbr0,firewall=1"}'
-    password: 'admin' # "{{ vault_102 }}"
+    password: 'admin' # "{{ vault_103 }}"
+
+#  master-node:
+#    vmid: '101'
+#    type: 'ubuntu'
+#    name: 'master-node'
+#    cores: '4'
+#    memory: '4096'
+#    swap: '0'
+#    storage: 'local-lvm'
+#    network: 'vmbr0'
+#    mounts: '{"mp0":"/mnt/shared,mp=/media/mount"}'
+#    netif: '{"net0":"name=eth0,gw=192.168.1.1,ip=192.168.1.13/24,bridge=vmbr0,firewall=1"}'
+#    password: "{{ vault_101 }}"
+#  worker-node:
+#    vmid: '102'
+#    type: 'ubuntu'
+#    name: 'worker-node'
+#    cores: '4'
+#    memory: '4096'
+#    swap: '0'
+#    storage: 'local-lvm'
+#    network: 'vmbr0'
+#    mounts: '{"mp0":"/mnt/shared,mp=/media/mount"}'
+#    netif: '{"net0":"name=eth0,gw=192.168.1.1,ip=192.168.1.12/24,bridge=vmbr0,firewall=1"}'
+#    password: 'admin' # "{{ vault_102 }}"

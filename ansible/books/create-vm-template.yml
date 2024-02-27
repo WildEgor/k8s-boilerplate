@@ -1,0 +1,71 @@
+---
+- hosts: host
+  become: true
+  remote_user: root
+
+  tasks:
+    - name: Install deps
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - libguestfs-tools
+
+    - name: Download image
+      ansible.builtin.get_url:
+        url: "{{ image.url }}"
+        dest: "{{ image.dest }}"
+        mode: "0644"
+
+    - name: Stop old vm
+      ansible.builtin.command: "qm stop {{ template.id }}"
+      ignore_errors: yes
+
+    - name: Remove old template
+      ansible.builtin.command: "qm destroy {{ template.id }}"
+      ignore_errors: yes
+
+    - name: Customize image (install packages)
+      ansible.builtin.command: "virt-customize -a {{ image.dest }} --install qemu-guest-agent"
+
+    - name: Customize image (set root passwd)
+      ansible.builtin.command: "virt-customize -a {{ image.dest }} --root-password password:{{ template.rootPassword }}"
+
+    - name: Create VM
+      ansible.builtin.command: |
+        qm create {{ template.id }} 
+        --name {{ template.name }} 
+        --ciuser {{ template.user }}
+        --cipassword {{ template.password }}
+        --cores {{ template.cores }} 
+        --memory {{ template.memory }} 
+        --net0 virtio,bridge={{ template.network }}
+
+    - name: Import disk
+      ansible.builtin.command: "qm importdisk {{ template.id }} {{ image.dest }} {{ template.volumeName }}"
+
+    - name: Set VM disk
+      ansible.builtin.command: "qm set {{ template.id }} --scsihw virtio-scsi-pci --scsi0 {{ template.volumeName }}:vm-{{ template.id }}-disk-0"
+
+    - name: Set VM boot disk
+      ansible.builtin.command: "qm set {{ template.id }} --boot c --bootdisk scsi0"
+
+    - name: Set VM attach cloudinit
+      ansible.builtin.command: "qm set {{ template.id }} --ide2 {{ template.volumeName }}:cloudinit"
+
+    - name: Set VM serial
+      ansible.builtin.command: "qm set {{ template.id }} --serial0 socket --vga serial0"
+
+    - name: Set VM ip opts
+      ansible.builtin.command: "qm set {{ template.id }} --ipconfig0 ip={{ template.ip }}"
+
+    - name: Set VM ssh
+      ansible.builtin.command: "qm set {{ template.id }} --sshkey {{ template.sshPubKey }}"
+
+    - name: Set VM cpu type
+      ansible.builtin.command: "qm set {{ template.id }} --cpu cputype={{ template.cpuType }}"
+
+    - name: Create template
+      ansible.builtin.command: "qm template {{ template.id }}"

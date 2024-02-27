@@ -7,5 +7,5 @@ services:
         context: .
         dockerfile: Dockerfile
     volumes:
-        - ./playbooks:/ansible
+        - .:/ansible
     command: tail -f /dev/null

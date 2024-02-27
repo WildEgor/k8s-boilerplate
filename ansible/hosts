@@ -1,4 +1,10 @@
 # It should live in /etc/ansible/hosts
+localhost
+
+[all:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_pass=admin
 
 [host]
 192.168.1.9 ansible_user=root

@@ -1,1 +1,1 @@
-ansible-playbook books\prep-host.yml
+ansible-playbook -i /ansible/hosts /ansible/books/prep-host.yml

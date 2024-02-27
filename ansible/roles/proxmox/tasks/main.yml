@@ -1,13 +1,13 @@
 - name: Create VMs
   tags: proxmox, create, deploy
   proxmox:
-    vmid: '{{ item.value.vmid | default([])}}'
     api_user: "{{ api_user }}"
     api_password: "{{ api_password }}"
     api_host: "{{ api_host }}"
+    vmid: '{{ item.value.vmid | default([])}}'
     hostname: '{{ item.key }}'
     node: '{{ item.value.node | default(defaults.node) }}'
-    password: '{{ item.value.password }}'
+    password: '{{ item.value.password | default(defaults.password) }}'
     pubkey: '{{ item.value.pubkey | default(defaults.pubkey) }}'
     cores: '{{ item.value.cores | default(defaults.cores) }}'
     cpus: '{{ item.value.cpu | default(defaults.cpu) }}'
@@ -21,12 +21,12 @@
     nameserver: '{{ item.value.nameserver | default(defaults.nameserver) }}'
     ostemplate: '{{ item.value.ostemplate | default(defaults.ostemplate) }}'
     state: 'present'
-  with_dict: "{{ cts }}"
+  with_dict: "{{ vms }}"
   loop_control:
     pause: 5
   notify:
     - sleep
-  register: 'created_cts_pve'
+  register: 'created_vms_pve'
   when: 'not item.value.cloudinit | default(false) | bool'
 
 - meta: flush_handlers
