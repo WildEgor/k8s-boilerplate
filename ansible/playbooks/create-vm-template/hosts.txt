@@ -1,0 +1,8 @@
+# Ansible Hosts
+[all:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_pass=admin
+
+[proxmox]
+192.168.1.9

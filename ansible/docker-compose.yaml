@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  ansible:
+    tty: true
+    build:
+        context: .
+        dockerfile: Dockerfile
+    volumes:
+        - ./playbooks:/ansible
+    command: tail -f /dev/null
