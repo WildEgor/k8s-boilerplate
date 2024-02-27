@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt update
-sudo apt upgade -y
+apt update
+apt upgade -y
 
-sudo apt install -y curl wget gnupg sudo iptables tmux keepalived haproxy
+apt install -y nano curl wget gnupg sudo iptables tmux keepalived haproxy
