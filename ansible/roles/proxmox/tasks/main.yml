@@ -1,32 +1,55 @@
-- name: Create VMs
-  tags: proxmox, create, deploy
-  proxmox:
-    api_user: "{{ api_user }}"
-    api_password: "{{ api_password }}"
-    api_host: "{{ api_host }}"
-    vmid: '{{ item.value.vmid | default([])}}'
-    hostname: '{{ item.key }}'
-    node: '{{ item.value.node | default(defaults.node) }}'
-    password: '{{ item.value.password | default(defaults.password) }}'
-    pubkey: '{{ item.value.pubkey | default(defaults.pubkey) }}'
-    cores: '{{ item.value.cores | default(defaults.cores) }}'
-    cpus: '{{ item.value.cpu | default(defaults.cpu) }}'
-    memory: '{{ item.value.memory | default(defaults.memory.ct) }}'
-    swap: '{{ item.value.swap | default([]) }}'
-    disk: '{{ item.value.disk | default(defaults.disk) }}'
-    #mounts: '{{ item.value.mounts | default([]) }}'
-    netif: '{{ item.value.netif | default([]) }}'
-    storage: '{{ item.value.storage | default(defaults.storage.ct) }}'
-    onboot: '{{ item.value.onboot | default(defaults.onboot) }}'
-    nameserver: '{{ item.value.nameserver | default(defaults.nameserver) }}'
-    ostemplate: '{{ item.value.ostemplate | default(defaults.ostemplate) }}'
-    state: 'present'
-  with_dict: "{{ vms }}"
-  loop_control:
-    pause: 5
-  notify:
-    - sleep
-  register: 'created_vms_pve'
-  when: 'not item.value.cloudinit | default(false) | bool'
+- name: Check if VM template already exists
+  ansible.builtin.shell: 'qm status {{ item.template.id | default(defaults.template.id) }}'
+  register: result
+  loop: '{{ vms }}'
+  tags: clone-vm
 
-- meta: flush_handlers
+- name: Check if VM IDs in vms are already in use
+  ansible.builtin.shell: 'qm status {{ item.id }}'
+  register: result
+  loop: '{{ vms }}'
+  failed_when: result.rc == 0
+  tags: clone-vm
+
+- debug: msg="result (redhat) = {{ result }}"
+
+- name: Clone VM block
+  tags: clone-vm
+  block:
+    - name: Clone VM and resize disk
+      ansible.builtin.shell:
+        cmd: |
+          qm clone {{ item.template.id | default(defaults.template.id) }} {{ item.id }} --name {{ item.name }} --full
+          qm resize {{ item.id }} scsi0 {{ item.disk.size | default(defaults.disk.size) }}
+      loop: '{{ vms }}'
+    - name: Set CPU configuration
+      ansible.builtin.shell:
+        cmd: |
+          qm set {{ item.id }} --cores {{ item.cores | default(defaults.cores) }}
+      loop: '{{ vms }}'
+      when: item.cores is defined
+    - name: Set Memory configuration
+      ansible.builtin.shell:
+        cmd: |
+          qm set {{ item.id }} --memory {{ item.memory.ct | default(defaults.memory.ct) }}
+      loop: '{{ vms }}'
+      when: item.memory is defined
+    - name: Set network settings
+      ansible.builtin.shell: 'qm set {{ item.id }} --net0 {{ item.net0 }}'
+      loop: '{{ vms }}'
+      when: item.net0 is defined
+    - name: Set IP configuration
+      ansible.builtin.shell: 'qm set {{ item.id }} --ipconfig0 {{ item.ipconfig0 | default(defaults.ipconfig0) }}'
+      loop: '{{ vms }}'
+      when: item.ipconfig0 is defined
+
+    - name: Set VM onboot
+      ansible.builtin.shell: 'qm set {{ item.id }} --onboot {{ item.onboot | default(defaults.onboot) }}'
+      loop: '{{ vms }}'
+      when: item.onboot is defined
+
+# FIXME: This is not working
+#    - name: Set Swap configuration
+#      ansible.builtin.shell: "qm guest exec {{ item.id }} --timeout 90 -- /bin/bash -c 'swapoff -a && sed -i.bak /\\sswap\\s/s/^/#/ /etc/fstab'"
+#      loop: '{{ vms }}'
+

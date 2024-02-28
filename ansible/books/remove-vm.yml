@@ -1,0 +1,17 @@
+---
+- hosts: host
+  remote_user: root
+
+  vars_prompt:
+    - name: VMID
+      prompt: 'Specify VM ID to remove'
+      private: no
+
+  tasks:
+    - name: Stop old vm
+      ansible.builtin.command: "qm stop {{ VMID }}"
+      ignore_errors: yes
+
+    - name: Remove old template
+      ansible.builtin.command: "qm destroy {{ VMID }}"
+      ignore_errors: yes
