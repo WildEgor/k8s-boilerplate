@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  ansible:
+    tty: true
+    build:
+      context: ./ansible
+      dockerfile: Dockerfile
+    volumes:
+      - ./ansible:/ansible
+      - ./certs/host:/home/.ssh
+    command: tail -f /dev/null
+
+  k3s:
+    tty: true
+    build:
+      context: ./k3s
+      dockerfile: Dockerfile
+    volumes:
+      - ./k3s/k3sup:/home/ubuntu
+    command: tail -f /dev/null

@@ -67,16 +67,14 @@
         content: '{{ template.sshPubKey }}'
         dest: '/tmp/public-ssh-key.pub'
 
-    - name: Remove public-ssh-key
-      ansible.builtin.file:
-        path: /tmp/public-ssh-key.pub
-        state: absent
-
     - name: Set VM ssh
       ansible.builtin.command: "qm set {{ template.id }} --sshkey /tmp/public-ssh-key.pub"
 
     - name: Set VM cpu type
       ansible.builtin.command: "qm set {{ template.id }} --cpu cputype={{ template.cpuType }}"
+
+    - name: Set VM customs
+      ansible.builtin.shell: 'qm set {{ template.id }} --cicustom {{ template.custom }}'
 
     - name: Create template
       ansible.builtin.command: "qm template {{ template.id }}"

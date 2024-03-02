@@ -28,9 +28,10 @@ template:
   volumeName: "local-lvm"
   network: "vmbr0"
   rootPassword: "admin" # "{{ vault_template_rootPassword }}"
-  sshPubKey: "~/.ssh/id_rsa.pub"
+  sshPubKey: "{{ lookup('file', '/home/.ssh/host/id_rsa.pub') }}"
   cpuType: "host"
   ip: "dhcp"
+  custom: "network=local:snippets/network-config.yaml"
   image:
     url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
     name: "jammy-server-cloudimg-amd64.img"
@@ -45,8 +46,8 @@ vms:
     memory:
       ct: '4096'
     swap: '0'
-    ipconfig0: 'ip=192.168.1.12/24,gw=192.168.1.1'
-    net0: 'virtio,bridge=vmbr0,tag=105'
+    # ipconfig0: 'ip=192.168.1.12/24,gw=192.168.1.1'
+    # net0: 'virtio,bridge=vmbr0'
     password: 'admin' # "{{ vault_101 }}"
   - id: '102'
     onboot: true
@@ -56,6 +57,6 @@ vms:
     memory:
       ct: '4096'
     swap: '0'
-    ipconfig0: 'ip=192.168.1.13/24,gw=192.168.1.1'
-    net0: 'virtio,bridge=vmbr0,tag=106'
+    # ipconfig0: 'ip=192.168.1.13/24,gw=192.168.1.1'
+    # net0: 'virtio,bridge=vmbr0'
     password: 'admin' # "{{ vault_102 }}"

@@ -7,12 +7,10 @@ ARG MITOGEN_VERSION=0.3.4
 ARG VCS_REF
 
 LABEL maintainer="Kartashov E. <kartashov_egor96@mail.ru>" \
-  org.label-schema.url="TODO" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.version=${ANSIBLE_VERSION} \
   org.label-schema.version_ansible=${ANSIBLE_VERSION} \
   org.label-schema.version_ansible_lint=${ANSIBLE_LINT_VERSION} \
-  org.label-schema.vcs-url="TODO" \
   org.label-schema.vcs-ref=${VCS_REF} \
   org.label-schema.docker.dockerfile="/Dockerfile" \
   org.label-schema.description="Ansible on alpine docker image" \
@@ -31,7 +29,10 @@ RUN apk --update --no-cache add \
         python3\
         rsync \
         sshpass \
-        nano
+        nano \
+        curl \
+        wget \
+        bash
 
 RUN apk --update --no-cache add --virtual \
         .build-deps \
@@ -70,7 +71,7 @@ COPY ./hosts /etc/ansible/hosts
 
 WORKDIR /ansible
 
-#ENTRYPOINT ["entrypoint"]
+RUN ln -s /ansible/roles /etc/ansible/roles
 
 # default command: display Ansible version
 CMD [ "ansible-playbook", "--version" ]
