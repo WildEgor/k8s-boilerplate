@@ -18,4 +18,5 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./k3s/k3sup:/home/ubuntu
+      - ./certs/vms:/home/ubuntu/.ssh
     command: tail -f /dev/null

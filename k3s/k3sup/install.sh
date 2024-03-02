@@ -51,7 +51,7 @@ if ! command -v k3sup version &> /dev/null
 then
     echo -e " \033[31;5mk3sup not found, installing\033[0m"
     curl -sLS https://get.k3sup.dev | sh
-    install -o root -g root -m 0755 k3sup /usr/local/bin/
+    install -o root -g root -m 0755 ~/k3sup /usr/local/bin/
 else
     echo -e " \033[32;5mk3sup already installed\033[0m"
 fi
