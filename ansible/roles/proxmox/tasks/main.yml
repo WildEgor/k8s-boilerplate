@@ -22,22 +22,26 @@
           qm clone {{ item.template.id | default(defaults.template.id) }} {{ item.id }} --name {{ item.name }} --full
           qm resize {{ item.id }} scsi0 {{ item.disk.size | default(defaults.disk.size) }}
       loop: '{{ vms }}'
+
     - name: Set CPU configuration
       ansible.builtin.shell:
         cmd: |
           qm set {{ item.id }} --cores {{ item.cores | default(defaults.cores) }}
       loop: '{{ vms }}'
       when: item.cores is defined
+
     - name: Set Memory configuration
       ansible.builtin.shell:
         cmd: |
           qm set {{ item.id }} --memory {{ item.memory.ct | default(defaults.memory.ct) }}
       loop: '{{ vms }}'
       when: item.memory is defined
+
     - name: Set network settings
       ansible.builtin.shell: 'qm set {{ item.id }} --net0 {{ item.net0 }}'
       loop: '{{ vms }}'
       when: item.net0 is defined
+
     - name: Set IP configuration
       ansible.builtin.shell: 'qm set {{ item.id }} --ipconfig0 {{ item.ipconfig0 | default(defaults.ipconfig0) }}'
       loop: '{{ vms }}'

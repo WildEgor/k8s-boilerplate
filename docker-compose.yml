@@ -4,11 +4,12 @@ services:
   ansible:
     tty: true
     build:
+      no_cache: true
       context: ./ansible
       dockerfile: Dockerfile
     volumes:
       - ./ansible:/ansible
-      - ./certs/host:/home/.ssh
+      - ./certs:/home/.ssh
     command: tail -f /dev/null
 
   k3s:
@@ -18,5 +19,5 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./k3s/k3sup:/home/ubuntu
-      - ./certs/vms:/home/ubuntu/.ssh
+      - ./certs:/home/ubuntu/.ssh
     command: tail -f /dev/null

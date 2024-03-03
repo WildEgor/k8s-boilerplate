@@ -6,6 +6,9 @@ ARG ANSIBLE_LINT_VERSION=6.22.1
 ARG MITOGEN_VERSION=0.3.4
 ARG VCS_REF
 
+ARG USER=ubuntu
+ARG GROUP=root
+
 LABEL maintainer="Kartashov E. <kartashov_egor96@mail.ru>" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.version=${ANSIBLE_VERSION} \
@@ -68,6 +71,12 @@ Host *\n\
 """ >> /etc/ssh/ssh_config
 
 COPY ./hosts /etc/ansible/hosts
+
+# Set user and group
+RUN adduser -S -G ${GROUP} ${USER} && mkdir /home/${USER}/.ssh
+RUN chown -R ${USER}:${GROUP} /home/${USER}/.ssh
+RUN chmod 700 /home/${USER}/.ssh
+# chmod 600 /home/username/.ssh/authorized_keys
 
 WORKDIR /ansible
 

@@ -1,0 +1,6 @@
+network:
+  ethernets:
+    ens18:
+      dhcp4: true
+      dhcp-identifier: mac # allow auto assign new IP
+  version: 2
