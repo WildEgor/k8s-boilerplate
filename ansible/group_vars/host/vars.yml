@@ -6,7 +6,7 @@ defaults:
   onboot: true
   node: 'pve'
   password: 'admin'
-  pubkey: "{{ lookup('file', '/home/.ssh/id_rsa.pub') }}"
+  pubkey: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
   nameserver: '192.168.1.1'
   storage:
     ct: 'local-lvm'
@@ -28,7 +28,7 @@ template:
   volumeName: "local-lvm"
   network: "vmbr0"
   rootPassword: "admin" # "{{ vault_template_rootPassword }}"
-  sshPubKey: "{{ lookup('file', '/home/.ssh/id_rsa.pub') }}"
+  sshPubKey: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
   cpuType: "host"
   ip: "dhcp"
   custom: "network=local:snippets/network-config.yaml"

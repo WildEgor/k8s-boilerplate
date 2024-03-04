@@ -52,7 +52,8 @@ RUN pip3 install --no-cache-dir --break-system-packages --upgrade --no-binary \
         cffi \
         ansible==${ANSIBLE_VERSION} \
         ansible-lint==${ANSIBLE_LINT_VERSION} \
-        mitogen==${MITOGEN_VERSION}
+        mitogen==${MITOGEN_VERSION} \
+        netaddr
 
 RUN apk del .build-deps
 

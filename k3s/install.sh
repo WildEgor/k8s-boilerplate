@@ -7,8 +7,8 @@ KVVERSION="v0.6.3"
 k3sVersion="v1.26.10+k3s2"
 
 # Set the IP addresses of the master and work nodes
-master1=192.168.1.12
-worker1=192.168.1.13
+master1=192.168.1.14
+worker1=192.168.1.15
 
 # User of remote machines
 user=ubuntu
@@ -50,8 +50,8 @@ timedatectl set-ntp on
 if ! command -v k3sup version &> /dev/null
 then
     echo -e " \033[31;5mk3sup not found, installing\033[0m"
-    curl -sLS https://get.k3sup.dev | sh
-    install -o root -g root -m 0755 ~/k3sup /usr/local/bin/
+    wget https://github.com/alexellis/k3sup/releases/download/0.13.5/k3sup-arm64 -O k3sup
+    install -o root -g root -m 0755 k3sup /usr/local/bin/
 else
     echo -e " \033[32;5mk3sup already installed\033[0m"
 fi
@@ -71,7 +71,7 @@ echo "StrictHostKeyChecking no" > ~/.ssh/config
 
 #add ssh keys for all nodes
 for node in "${all[@]}"; do
-  ssh-copy-id $user@$node
+  ssh-copy-id -i ~/.ssh/$certName $user@$node
 done
 
 # Install policycoreutils for each node
@@ -100,6 +100,7 @@ k3sup install \
   --context k3s-ha
 echo -e " \033[32;5mFirst Node bootstrapped successfully!\033[0m"
 
+echo -e " \033[32;5mSetup kube-vip...\033[0m"
 # Step 2: Install Kube-VIP for HA
 kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
 
@@ -111,11 +112,12 @@ cat kube-vip | sed 's/$interface/'$interface'/g; s/$vip/'$vip'/g' > $HOME/kube-v
 scp -i ~/.ssh/$certName $HOME/kube-vip.yaml $user@$master1:~/kube-vip.yaml
 
 # Step 5: Connect to Master1 and move kube-vip.yaml
-ssh $user@$master1 -i ~/.ssh/$certName <<- EOF
+ssh $user@$master1 -i ~/.ssh/$certName sudo su <<- EOF
   mkdir -p /var/lib/rancher/k3s/server/manifests
   mv kube-vip.yaml /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
 EOF
 
+echo -e " \033[32;5mTry join master nodes...\033[0m"
 # Step 6: Add new master nodes (servers) & workers
 for newnode in "${masters[@]}"; do
   k3sup join \
@@ -131,6 +133,7 @@ for newnode in "${masters[@]}"; do
   echo -e " \033[32;5mMaster node joined successfully!\033[0m"
 done
 
+echo -e " \033[32;5mTry join worker nodes...\033[0m"
 # add workers
 for newagent in "${workers[@]}"; do
   k3sup join \
@@ -171,7 +174,7 @@ kubectl wait --namespace metallb-system \
                 --for=condition=ready pod \
                 --selector=component=controller \
                 --timeout=120s
-kubectl apply -f ipAddressPool.yaml
+kubectl apply -f $HOME/ipAddressPool.yaml
 kubectl apply -f https://raw.githubusercontent.com/JamesTurland/JimsGarage/main/Kubernetes/K3S-Deploy/l2Advertisement.yaml
 
 kubectl get nodes

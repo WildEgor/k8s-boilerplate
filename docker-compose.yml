@@ -9,15 +9,15 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./ansible:/ansible
-      - ./certs:/home/.ssh
+      - ./certs:/root/.ssh
     command: tail -f /dev/null
 
   k3s:
     tty: true
     build:
-      context: ./k3s
+      context: ./k8s/k3sup
       dockerfile: Dockerfile
     volumes:
-      - ./k3s/k3sup:/home/ubuntu
+      - ./k3s:/home/ubuntu/k3s
       - ./certs:/home/ubuntu/.ssh
     command: tail -f /dev/null
